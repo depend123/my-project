@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>York - Ball Game with WebAssembly</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        
+        #game-container {
+            position: relative;
+        }
+        
+        canvas {
+            border: 1px solid #333;
+            background-color: #fff;
+        }
+        
+        #loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            color: white;
+            font-family: Arial, sans-serif;
+            font-size: 24px;
+        }
+        
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 2s linear infinite;
+            margin-right: 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+    <!-- Fallback to msgpack-lite if WASM fails to load -->
+    <script src="https://cdn.jsdelivr.net/npm/msgpack-lite@0.1.26/dist/msgpack.min.js"></script>
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="game-canvas" width="800" height="600"></canvas>
+        <div id="loading-overlay">
+            <div class="loader"></div>
+            <div>Loading WebAssembly...</div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Check if the browser supports WebAssembly
+        if (typeof WebAssembly === 'object' && typeof WebAssembly.instantiate === 'function') {
+            console.log("WebAssembly is supported");
+            
+            // We'll hide the loading overlay when the game is initialized
+            window.addEventListener('wasmReady', () => {
+                document.getElementById('loading-overlay').style.display = 'none';
+            }, { once: true });
+            
+            // Import the client script as a module
+            import('./client_with_wasm.js');
+        } else {
+            console.warn("WebAssembly is not supported in this browser");
+            document.getElementById('loading-overlay').innerHTML = 
+                "Your browser doesn't support WebAssembly. Please use a modern browser.";
+        }
+    </script>
+</body>
+</html>
